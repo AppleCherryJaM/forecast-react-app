@@ -73,7 +73,6 @@ const App = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const saveHandler = (tripData) => {
-    console.log(tripData)
     setTripsState((prevState) => {
       const newTrip = {
         ...tripData,
@@ -81,23 +80,40 @@ const App = () => {
       };
       return { ...prevState, trips: [...prevState.trips, newTrip], selectedTripId: undefined };
     })
-    console.log(tripsState);
+
   }
 
-  //fetch
+  const selectItemHandler = (id) => {
+    setTripsState((prevState) => {
+      return { ...prevState, selectedTripId: id };
+    });
+  };
 
   useEffect(() => {
     const retrieveData = JSON.parse(
       localStorage.getItem(LOCAL_STORAGE_TOKEN)
     );
     if (retrieveData) {
-      setTripsState(retrieveData);
+      setTripsState((prevState) => { 
+        return {
+          ...prevState,
+          trips: [
+          ...prevState.trips,
+          ...retrieveData
+        ]} 
+      });
+      console.log("TripsState: ", tripsState);
+      console.log("Retrieve: ", retrieveData);
     }
   },[]);
 
-  useEffect(() => { localStorage.setItem(LOCAL_STORAGE_TOKEN, JSON.stringify(tripsState)) }, [tripsState]);
+  useEffect(() => {
+    if (tripsState.trips.length > 0) {
+      localStorage.setItem(LOCAL_STORAGE_TOKEN, JSON.stringify(tripsState.trips))
+    } 
+  }, [tripsState]);
   return (
-    <UserMenu info={INFO} onSave={saveHandler}/>
+    <UserMenu trips={tripsState.trips} onSave={saveHandler} onSelect={selectItemHandler} activeId={tripsState.selectedTripId}/>
   );
 }
 

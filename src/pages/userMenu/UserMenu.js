@@ -6,10 +6,9 @@ import TripsList from "../../components/tripsList/TripsList";
 import Forecast from "../../components/forecast/Forecast";
 
 const UserMenu = props => {
-	const [activeId, setActiveId] = useState(null);
 	const [isError, setIsError] = useState(false);
-	const [isModalActive, setIsModalActive] = useState(false);
-	const activeItem = props.info.find(item => item.id === activeId);
+	const activeItem = props.trips.find(item => item.id === props.activeId);
+	console.log("activeItem: ", activeItem, props.activeId);
 
 	const modal = useRef();
 	const city = useRef();
@@ -25,22 +24,9 @@ const UserMenu = props => {
 			setIsError(true);
 			return;
 		}
-		const forecastUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${selectedCity}/${selectedFromDate}/${selectedToDate}?unitGroup=metric&include=days&key=LWECL5EWTZ4DNPDY3TRMGLU2L&contentType=json`
-		// try {
-		// 	const response = await fetch(forecastUrl);
-		// 	const json = await response.json();
-		// 	console.log("Успех:", JSON.stringify(json));
-		props.onSave({ city: selectedCity, from: selectedFromDate, to: selectedToDate});
-		// } catch (error) {
-		// 	console.error("Ошибка:", error);
-		// }
+		props.onSave({ city: selectedCity, from: selectedFromDate, to: selectedToDate });
+		modal.current.close();
 	}
-
-	const selectItemHandler = (id) => {
-		setActiveId(id);
-	}
-
-
 
 	return (
 		<>
@@ -65,9 +51,9 @@ const UserMenu = props => {
 				<div className="searchbar">
 
 				</div>
-				<TripsList items={props.info} onClick={selectItemHandler} />
+				<TripsList items={props.trips} onClick={props.onSelect} />
 				<button className="add-button" onClick={() => modal.current.open()} >Add Trip</button>
-				{activeItem && <Forecast items={activeItem.forecast} />}
+				{activeItem && <Forecast item={activeItem} />}
 			</main>
 		</>
 		
